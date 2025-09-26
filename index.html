@@ -180,9 +180,18 @@
             <!-- 操作按钮 -->
             <div class="action-buttons">
                 <button id="addPageBtn" class="btn btn-primary">添加新页面</button>
+                <button id="copyPageBtn" class="btn btn-info">复制当前页面</button>
                 <button id="saveBtn" class="btn btn-secondary">保存项目</button>
                 <button id="exportBtn" class="btn btn-success">导出PDF</button>
             </div>
+        </div>
+    </div>
+
+    <!-- 右键菜单 -->
+    <div id="contextMenu" class="context-menu" style="display: none;">
+        <div class="context-menu-item" id="copyPageMenuItem">
+            <span class="context-menu-icon">📋</span>
+            <span class="context-menu-text">复制页面</span>
         </div>
     </div>
 

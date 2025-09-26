@@ -11,6 +11,7 @@ class PDFNavigation {
         this.onPageChangeCallback = null;
         this.onPageAddCallback = null;
         this.onPageDeleteCallback = null;
+        this.selectedPageForContext = null; // 右键菜单选中的页面
         
         this.init();
     }
@@ -118,6 +119,12 @@ class PDFNavigation {
         if (addPageBtn) {
             addPageBtn.addEventListener('click', async () => await this.addPage());
         }
+
+        // 复制页面按钮
+        const copyPageBtn = document.querySelector('#copyPageBtn');
+        if (copyPageBtn) {
+            copyPageBtn.addEventListener('click', async () => await this.copyPage(this.currentPage));
+        }
         
         // 页面缩略图点击事件（事件委托）
         const thumbnailsContainer = this.container.querySelector('#pageThumbnails');
@@ -145,7 +152,22 @@ class PDFNavigation {
                     }
                 }
             });
+
+            // 右键菜单事件
+            thumbnailsContainer.addEventListener('contextmenu', (e) => {
+                const thumbnail = e.target.closest('.page-thumbnail');
+                if (thumbnail) {
+                    e.preventDefault();
+                    const pageNum = parseInt(thumbnail.dataset.page);
+                    if (!isNaN(pageNum)) {
+                        this.showContextMenu(e, pageNum);
+                    }
+                }
+            });
         }
+
+        // 绑定右键菜单功能
+        this.bindContextMenuEvents();
     }
     
     /**
@@ -656,6 +678,124 @@ class PDFNavigation {
             }
             
             console.log(`保存后页面数据:`, JSON.parse(JSON.stringify(page)));
+        }
+    }
+
+    /**
+     * 绑定右键菜单事件
+     */
+    bindContextMenuEvents() {
+        const contextMenu = document.getElementById('contextMenu');
+        const copyMenuItem = document.getElementById('copyPageMenuItem');
+
+        if (copyMenuItem) {
+            copyMenuItem.addEventListener('click', () => {
+                this.hideContextMenu();
+                if (this.selectedPageForContext) {
+                    this.copyPage(this.selectedPageForContext);
+                }
+            });
+        }
+
+        // 点击其他地方隐藏菜单
+        document.addEventListener('click', (e) => {
+            if (contextMenu && !contextMenu.contains(e.target)) {
+                this.hideContextMenu();
+            }
+        });
+
+        // ESC键隐藏菜单
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.hideContextMenu();
+            }
+        });
+    }
+
+    /**
+     * 显示右键菜单
+     */
+    showContextMenu(event, pageNum) {
+        const contextMenu = document.getElementById('contextMenu');
+        if (!contextMenu) return;
+
+        this.selectedPageForContext = pageNum;
+
+        // 设置菜单位置
+        contextMenu.style.left = `${event.pageX}px`;
+        contextMenu.style.top = `${event.pageY}px`;
+        contextMenu.style.display = 'block';
+
+        // 确保菜单不会超出屏幕边界
+        const rect = contextMenu.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        if (rect.right > viewportWidth) {
+            contextMenu.style.left = `${event.pageX - rect.width}px`;
+        }
+        if (rect.bottom > viewportHeight) {
+            contextMenu.style.top = `${event.pageY - rect.height}px`;
+        }
+    }
+
+    /**
+     * 隐藏右键菜单
+     */
+    hideContextMenu() {
+        const contextMenu = document.getElementById('contextMenu');
+        if (contextMenu) {
+            contextMenu.style.display = 'none';
+        }
+        this.selectedPageForContext = null;
+    }
+
+    /**
+     * 复制页面
+     */
+    async copyPage(pageNum) {
+        try {
+            console.log(`复制页面 ${pageNum}`);
+            
+            // 获取要复制的页面数据
+            const sourcePageData = this.getPageData(pageNum);
+            if (!sourcePageData) {
+                console.error(`页面 ${pageNum} 数据不存在`);
+                return;
+            }
+
+            // 创建新页面
+            const newPageId = this.pages.length + 1;
+            const newPageData = this.createNewPageData(newPageId);
+            
+            // 深拷贝源页面的数据到新页面
+            newPageData.decorations = JSON.parse(JSON.stringify(sourcePageData.decorations || {}));
+            newPageData.roomStates = JSON.parse(JSON.stringify(sourcePageData.roomStates || {}));
+            newPageData.templateId = sourcePageData.templateId;
+            newPageData.paperSize = sourcePageData.paperSize;
+            newPageData.orientation = sourcePageData.orientation;
+
+            // 添加到页面列表
+            this.pages.push(newPageData);
+
+            // 创建缩略图
+            await this.createThumbnail(newPageId);
+
+            // 更新显示
+            this.updateDisplay();
+            this.updatePageCount();
+
+            // 切换到新复制的页面
+            this.switchToPage(newPageId);
+
+            // 触发页面添加回调
+            if (this.pageAddCallback) {
+                this.pageAddCallback(newPageId);
+            }
+
+            console.log(`成功复制页面 ${pageNum} 到新页面 ${newPageId}`);
+        } catch (error) {
+            console.error('复制页面时出错:', error);
         }
     }
     
