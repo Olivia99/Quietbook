@@ -123,17 +123,26 @@ class PDFNavigation {
         const thumbnailsContainer = this.container.querySelector('#pageThumbnails');
         if (thumbnailsContainer) {
             thumbnailsContainer.addEventListener('click', (e) => {
+                // 处理删除按钮点击
                 if (e.target.classList.contains('delete-page-btn')) {
-                    // 阻止事件冒泡，防止触发页面切换
+                    // 阻止事件冒泡和默认行为，防止触发页面切换
                     e.stopPropagation();
                     e.preventDefault();
                     
+                    // 获取页面编号并调用删除方法
                     const pageNum = parseInt(e.target.dataset.page);
-                    this.deletePage(pageNum);
-                } else if (e.target.closest('.page-thumbnail')) {
+                    if (!isNaN(pageNum)) {
+                        // 直接调用删除方法，不使用setTimeout
+                        this.deletePage(pageNum);
+                    }
+                } 
+                // 处理缩略图点击（切换页面）
+                else if (e.target.closest('.page-thumbnail')) {
                     const thumbnail = e.target.closest('.page-thumbnail');
                     const pageNum = parseInt(thumbnail.dataset.page);
-                    this.switchToPage(pageNum);
+                    if (!isNaN(pageNum)) {
+                        this.switchToPage(pageNum);
+                    }
                 }
             });
         }
@@ -171,65 +180,50 @@ class PDFNavigation {
      * 删除页面
      */
     deletePage(pageNum) {
-        // 首先验证页面数量
+        // 基本验证
         if (this.totalPages <= 1) {
             alert('至少需要保留一页');
             return false;
         }
         
-        // 验证页面编号是否有效
         if (pageNum < 1 || pageNum > this.totalPages) {
             console.error(`无效的页面编号: ${pageNum}`);
             return false;
         }
         
-        // 检查页面是否存在
-        const pageExists = this.pages.some(page => page.id === pageNum);
-        if (!pageExists) {
-            console.error(`页面 ${pageNum} 不存在`);
-            return false;
-        }
-        
-        // 显示确认对话框
-        if (confirm(`确定要删除第 ${pageNum} 页吗？`)) {
-            try {
-                // 用户确认删除，开始执行删除操作
-                
-                // 从页面数据中移除
-                this.pages = this.pages.filter(page => page.id !== pageNum);
-                
-                // 移除缩略图
-                const thumbnail = this.container.querySelector(`[data-page="${pageNum}"]`);
-                if (thumbnail) {
-                    thumbnail.remove();
-                }
-                
-                // 更新页面编号
-                this.reorderPages();
-                
-                // 如果删除的是当前页面，切换到第一页
-                if (this.currentPage === pageNum) {
-                    this.switchToPage(1);
-                } else if (this.currentPage > pageNum) {
-                    this.currentPage--;
-                }
-                
-                this.totalPages--;
-                this.updateDisplay();
-                
-                // 触发回调
-                if (this.onPageDeleteCallback) {
-                    this.onPageDeleteCallback(pageNum);
-                }
-                
-                return true;
-            } catch (error) {
-                console.error(`删除页面 ${pageNum} 时发生错误:`, error);
-                alert(`删除页面时发生错误，请重试`);
-                return false;
+        try {
+            // 直接执行删除操作，不显示确认对话框
+            
+            // 从数据中移除页面
+            this.pages = this.pages.filter(page => page.id !== pageNum);
+            
+            // 移除DOM中的缩略图
+            const thumbnail = this.container.querySelector(`.page-thumbnail[data-page="${pageNum}"]`);
+            if (thumbnail) {
+                thumbnail.remove();
             }
-        } else {
-            // 用户取消删除，不做任何操作
+            
+            // 更新页面编号和总页数
+            this.reorderPages();
+            
+            // 处理当前页面的切换
+            if (this.currentPage === pageNum) {
+                this.switchToPage(1);
+            } else if (this.currentPage > pageNum) {
+                this.currentPage--;
+            }
+            
+            // 更新显示
+            this.updateDisplay();
+            
+            // 触发回调
+            if (this.onPageDeleteCallback) {
+                this.onPageDeleteCallback(pageNum);
+            }
+            
+            return true;
+        } catch (error) {
+            console.error(`删除页面时发生错误:`, error);
             return false;
         }
     }
@@ -238,6 +232,7 @@ class PDFNavigation {
      * 重新排序页面
      */
     reorderPages() {
+        // 获取所有缩略图并重新编号
         const thumbnails = this.container.querySelectorAll('.page-thumbnail');
         thumbnails.forEach((thumbnail, index) => {
             const newPageNum = index + 1;
@@ -251,6 +246,9 @@ class PDFNavigation {
             ...page,
             id: index + 1
         }));
+        
+        // 更新总页数，确保与实际显示的缩略图数量一致
+        this.totalPages = thumbnails.length;
     }
     
     /**
@@ -324,6 +322,13 @@ class PDFNavigation {
      * 更新显示
      */
     updateDisplay() {
+        // 确保总页数与实际缩略图数量一致
+        const thumbnails = this.container.querySelectorAll('.page-thumbnail');
+        if (this.totalPages !== thumbnails.length) {
+            this.totalPages = thumbnails.length;
+        }
+        
+        // 更新页码显示
         this.updatePageCount();
     }
     

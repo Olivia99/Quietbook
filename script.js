@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification('设置已保存！', 'success');
     }
     
-    // 导出PDF功能
+    // 导出PDF功能 - 支持多页面导出
     async function exportPDF() {
         let progressNotification = null;
         
@@ -365,6 +365,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (typeof window.jspdf === 'undefined') {
                 showNotification('jsPDF库未加载，请刷新页面重试', 'error');
+                return;
+            }
+            
+            // 检查PDF导航组件是否存在
+            if (!pdfNavigation) {
+                showNotification('PDF导航组件未初始化，请刷新页面重试', 'error');
                 return;
             }
             
@@ -383,9 +389,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // 获取当前纸张设置
-            const paperSize = getCurrentPaperSize();
-            const orientation = getCurrentOrientation();
+            // 保存当前页面状态
+            const originalCurrentPage = pdfNavigation.getCurrentPage();
+            const currentState = getCurrentPageState();
+            if (currentState) {
+                pdfNavigation.saveCurrentPageState(currentState);
+            }
+            
+            // 获取所有页面数据
+            const totalPages = pdfNavigation.getTotalPages();
+            const allPages = [];
+            for (let i = 1; i <= totalPages; i++) {
+                const pageData = pdfNavigation.getPageData(i);
+                if (pageData) {
+                    allPages.push({ pageNum: i, data: pageData });
+                }
+            }
+            
+            if (allPages.length === 0) {
+                showNotification('没有找到可导出的页面', 'error');
+                return;
+            }
+            
+            // 获取第一页的纸张设置作为PDF的基础设置
+            const firstPageData = allPages[0].data;
+            const paperSize = firstPageData.paperSize || getCurrentPaperSize();
+            const orientation = firstPageData.orientation || getCurrentOrientation();
             
             // 定义纸张尺寸（毫米）
             const paperSizes = {
@@ -405,31 +434,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 pdfHeight = size.height;
             }
             
-            showNotification('正在截取页面内容...', 'info');
-            
-            // 使用html2canvas截取预览区域
-            const canvas = await html2canvas(paperPreview, {
-                backgroundColor: '#ffffff',
-                scale: 3, // 提高清晰度到3倍
-                useCORS: true,
-                allowTaint: true,
-                logging: false,
-                width: paperPreview.offsetWidth,
-                height: paperPreview.offsetHeight,
-                removeContainer: true,
-                imageTimeout: 15000,
-                onclone: function(clonedDoc) {
-                    // 确保克隆的文档样式正确
-                    const clonedElement = clonedDoc.getElementById('paperPreview');
-                    if (clonedElement) {
-                        clonedElement.style.transform = 'none';
-                        clonedElement.style.transition = 'none';
-                    }
-                }
-            });
-            
-            showNotification('正在生成PDF文档...', 'info');
-            
             // 创建PDF
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF({
@@ -438,39 +442,95 @@ document.addEventListener('DOMContentLoaded', function() {
                 format: [pdfWidth, pdfHeight]
             });
             
-            // 计算图片在PDF中的尺寸，保持宽高比
-            const imgWidth = canvas.width;
-            const imgHeight = canvas.height;
+            // 遍历所有页面，为每个页面生成截图并添加到PDF
+            for (let i = 0; i < allPages.length; i++) {
+                const { pageNum, data } = allPages[i];
+                
+                showNotification(`正在处理第 ${pageNum} 页 (${i + 1}/${allPages.length})...`, 'info');
+                
+                // 切换到当前页面并应用数据
+                await new Promise(resolve => {
+                    // 切换页面
+                    pdfNavigation.switchToPage(pageNum);
+                    
+                    // 应用页面数据
+                    applyPageDataToDisplay(data);
+                    
+                    // 等待页面渲染完成
+                    setTimeout(resolve, 500);
+                });
+                
+                // 截取当前页面
+                const canvas = await html2canvas(paperPreview, {
+                    backgroundColor: '#ffffff',
+                    scale: 3, // 提高清晰度到3倍
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    width: paperPreview.offsetWidth,
+                    height: paperPreview.offsetHeight,
+                    removeContainer: true,
+                    imageTimeout: 15000,
+                    onclone: function(clonedDoc) {
+                        // 确保克隆的文档样式正确
+                        const clonedElement = clonedDoc.getElementById('paperPreview');
+                        if (clonedElement) {
+                            clonedElement.style.transform = 'none';
+                            clonedElement.style.transition = 'none';
+                        }
+                    }
+                });
+                
+                // 计算图片在PDF中的尺寸，保持宽高比
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+                
+                // 使用更精确的比例计算
+                const widthRatio = pdfWidth / imgWidth;
+                const heightRatio = pdfHeight / imgHeight;
+                const ratio = Math.min(widthRatio, heightRatio);
+                
+                const scaledWidth = imgWidth * ratio;
+                const scaledHeight = imgHeight * ratio;
+                
+                // 计算居中位置
+                const x = (pdfWidth - scaledWidth) / 2;
+                const y = (pdfHeight - scaledHeight) / 2;
+                
+                // 将canvas转换为图片
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                
+                // 如果不是第一页，添加新页面
+                if (i > 0) {
+                    pdf.addPage();
+                }
+                
+                // 添加图片到PDF
+                pdf.addImage(imgData, 'JPEG', x, y, scaledWidth, scaledHeight);
+                
+                showNotification(`第 ${pageNum} 页处理完成`, 'info');
+            }
             
-            // 使用更精确的比例计算
-            const widthRatio = pdfWidth / imgWidth;
-            const heightRatio = pdfHeight / imgHeight;
-            const ratio = Math.min(widthRatio, heightRatio);
-            
-            const scaledWidth = imgWidth * ratio;
-            const scaledHeight = imgHeight * ratio;
-            
-            // 计算居中位置
-            const x = (pdfWidth - scaledWidth) / 2;
-            const y = (pdfHeight - scaledHeight) / 2;
-            
-            showNotification('正在处理图像数据...', 'info');
-            
-            // 将canvas转换为图片并添加到PDF
-            const imgData = canvas.toDataURL('image/jpeg', 0.95); // 使用JPEG格式，质量95%
-            pdf.addImage(imgData, 'JPEG', x, y, scaledWidth, scaledHeight);
+            // 恢复到原始页面
+            if (originalCurrentPage !== pdfNavigation.getCurrentPage()) {
+                pdfNavigation.switchToPage(originalCurrentPage);
+                const originalPageData = pdfNavigation.getPageData(originalCurrentPage);
+                if (originalPageData) {
+                    applyPageDataToDisplay(originalPageData);
+                }
+            }
             
             // 生成文件名
             const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
             const templateName = templateManager.currentTemplate ? templateManager.currentTemplate.name : '未知模板';
-            const filename = `安静书_${templateName}_${paperSize.toUpperCase()}_${orientation}_${timestamp}.pdf`;
+            const filename = `安静书_${templateName}_${totalPages}页_${paperSize.toUpperCase()}_${orientation}_${timestamp}.pdf`;
             
             showNotification('正在保存PDF文件...', 'info');
             
             // 保存PDF
             pdf.save(filename);
             
-            showNotification(`PDF导出成功！文件名: ${filename}`, 'success');
+            showNotification(`PDF导出成功！共 ${totalPages} 页，文件名: ${filename}`, 'success');
             
         } catch (error) {
             console.error('PDF导出失败:', error);
