@@ -453,13 +453,15 @@ header h1 {
 
 .preview-container {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
     min-height: 1400px;
     padding: 20px;
     background: #f7fafc;
     border-radius: 10px;
-    overflow: auto;
+    overflow: visible;
+    gap: 20px;
 }
 
 /* 纸张预览样式 */
@@ -620,7 +622,8 @@ header h1 {
 }
 
 .template-dropdown {
-    width: 100%;
+    width: fit-content; /* hug content */
+    min-width: 150px; /* 最小宽度确保可读性 */
     padding: 10px 15px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
@@ -631,6 +634,11 @@ header h1 {
     transition: all 0.3s ease;
 }
 
+/* 在统一设置容器中的模板选择器 */
+.unified-paper-settings .template-dropdown {
+    width: fit-content;
+}
+
 .template-dropdown:hover {
     border-color: #667eea;
 }
@@ -639,6 +647,54 @@ header h1 {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* 统一纸张设置容器样式 */
+.unified-paper-settings {
+    display: flex;
+    flex-direction: column;
+    gap: auto;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+}
+
+/* 横向排列的纸张设置 */
+.unified-paper-settings.horizontal {
+    flex-direction: row;
+    gap: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background: rgba(248, 249, 250, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    position: relative;
+    z-index: 10;
+}
+
+/* 设置项样式 */
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: fit-content; /* hug content */
+    margin-bottom: 8px;
+}
+
+.setting-item:last-child {
+    margin-bottom: 0;
+}
+
+/* 横向排列时的设置项样式 */
+.unified-paper-settings.horizontal .setting-item {
+    margin-bottom: 0;
+    margin-right: 8px;
+}
+
+.unified-paper-settings.horizontal .setting-item:last-child {
+    margin-right: 0;
 }
 
 /* 紧凑纸张设置样式 */

@@ -18,7 +18,50 @@
     <div class="container">
         <!-- 左侧预览区域 -->
         <div class="preview-section">
-            <h2>纸张预览</h2>
+          
+            <div>
+                  <h2>纸张预览</h2>
+                  <!-- 纸张设置 - 横向排列 -->
+                    <div class="unified-paper-settings horizontal">
+                        <!-- 模板选择 -->
+                        <div class="setting-item">
+                            <label class="setting-label">模板选择</label>
+                            <div class="template-selector">
+                                <select id="templateSelect" class="template-dropdown">
+                                    <option value="basic-room">基础房间</option>
+                                    <option value="dual-room">双房间</option>
+                                    <!-- 更多模板将在这里添加 -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- 尺寸选择 -->
+                        <div class="setting-item">
+                            <label class="setting-label">尺寸</label>
+                            <div class="button-group compact">
+                                <input type="radio" name="paperSize" value="letter" id="size-letter" checked>
+                                <label for="size-letter" class="btn-toggle">Letter</label>
+                                <input type="radio" name="paperSize" value="a4" id="size-a4">
+                                <label for="size-a4" class="btn-toggle">A4</label>
+                            </div>
+                        </div>
+                        
+                        <!-- 方向选择 -->
+                        <div class="setting-item">
+                            <label class="setting-label">方向</label>
+                            <div class="button-group compact">
+                                <input type="radio" name="orientation" value="portrait" id="orient-portrait" checked>
+                                <label for="orient-portrait" class="btn-toggle">
+                                    <span class="icon">📄</span>竖向
+                                </label>
+                                <input type="radio" name="orientation" value="landscape" id="orient-landscape">
+                                <label for="orient-landscape" class="btn-toggle">
+                                    <span class="icon">📃</span>横向
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+            </div>
             
             <!-- 房间切换tab（仅双房间模板时显示） -->
             <div class="room-tabs" id="roomTabs" style="display: none;">
@@ -29,6 +72,8 @@
             <div class="preview-container">
                 <!-- 纸张预览 - 包含模板 -->
                 <div id="paperPreview" class="paper-preview letter landscape">
+                  
+                    
                     <!-- 模板容器 - 100%填充纸张 -->
                     <div id="templateContainer" class="template-container">
                         <!-- 模板内容将在这里动态生成 -->
@@ -40,64 +85,12 @@
             </div>
         </div>
 
-        <!-- 右侧选项面板 -->
+        <!-- 右侧装修面板 -->
         <div class="options-section">
-            <h2>设置选项</h2>
+            <h2>装修</h2>
             
-            <!-- 主标签页导航 -->
-            <div class="main-tabs">
-                <button class="main-tab active" data-tab="paper">纸张设置</button>
-                <button class="main-tab" data-tab="decoration">装修</button>
-            </div>
-            
-            <!-- 纸张设置标签页内容 -->
-            <div class="tab-content active" id="paper-tab">
-                <!-- 模板选择 -->
-                <div class="option-group">
-                    <h3>模板选择</h3>
-                    <div class="template-selector">
-                        <select id="templateSelect" class="template-dropdown">
-                            <option value="basic-room">基础房间</option>
-                            <option value="dual-room">双房间</option>
-                            <!-- 更多模板将在这里添加 -->
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="option-group">
-                    <div class="paper-settings-compact">
-                        <!-- 第一行：尺寸和方向 -->
-                        <div class="settings-row">
-                            <div class="setting-group">
-                                <label class="setting-label">尺寸</label>
-                                <div class="button-group compact">
-                                    <input type="radio" name="paperSize" value="letter" id="size-letter" checked>
-                                    <label for="size-letter" class="btn-toggle">Letter</label>
-                                    <input type="radio" name="paperSize" value="a4" id="size-a4">
-                                    <label for="size-a4" class="btn-toggle">A4</label>
-                                </div>
-                            </div>
-                            
-                            <div class="setting-group">
-                                <label class="setting-label">方向</label>
-                                <div class="button-group compact">
-                                    <input type="radio" name="orientation" value="portrait" id="orient-portrait" checked>
-                                    <label for="orient-portrait" class="btn-toggle">
-                                        <span class="icon">📄</span>竖向
-                                    </label>
-                                    <input type="radio" name="orientation" value="landscape" id="orient-landscape">
-                                    <label for="orient-landscape" class="btn-toggle">
-                                        <span class="icon">📃</span>横向
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 装修标签页内容 -->
-            <div class="tab-content" id="decoration-tab">
+            <!-- 装修内容 -->
+            <div class="decoration-content-main">
                 <!-- 装修横向标签 -->
                 <div class="decoration-tabs">
                     <button class="decoration-tab active" data-decoration="home">🏠 家装</button>

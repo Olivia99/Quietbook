@@ -16,15 +16,43 @@ class PDFNavigation {
     }
     
     /**
+     * 获取当前unified-paper-settings的设置值
+     */
+    getCurrentPaperSettings() {
+        // 获取当前模板选择
+        const templateSelect = document.getElementById('templateSelect');
+        const currentTemplateId = templateSelect ? templateSelect.value : 'basic-room';
+        
+        // 获取当前纸张尺寸
+        const paperSizeRadio = document.querySelector('input[name="paperSize"]:checked');
+        const currentPaperSize = paperSizeRadio ? paperSizeRadio.value : 'letter';
+        
+        // 获取当前方向
+        const orientationRadio = document.querySelector('input[name="orientation"]:checked');
+        const currentOrientation = orientationRadio ? orientationRadio.value : 'portrait';
+        
+        console.log(`获取当前纸张设置 - 模板: ${currentTemplateId}, 尺寸: ${currentPaperSize}, 方向: ${currentOrientation}`);
+        
+        return {
+            templateId: currentTemplateId,
+            paperSize: currentPaperSize,
+            orientation: currentOrientation
+        };
+    }
+
+    /**
      * 创建新页面的数据结构
      */
     createNewPageData(pageId) {
+        // 获取当前unified-paper-settings的设置
+        const currentSettings = this.getCurrentPaperSettings();
+        
         // 使用JSON深拷贝确保每个页面都有独立的对象引用
         const defaultData = {
             id: pageId,
-            templateId: 'basic-room', // 默认模板
-            paperSize: 'letter', // 默认纸张尺寸
-            orientation: 'landscape', // 默认方向
+            templateId: currentSettings.templateId, // 使用当前选择的模板
+            paperSize: currentSettings.paperSize, // 使用当前选择的纸张尺寸
+            orientation: currentSettings.orientation, // 使用当前选择的方向
             decorations: {
                 wallpaper: null,
                 floor: null,
@@ -53,6 +81,8 @@ class PDFNavigation {
             createdAt: new Date().toISOString()
         };
         
+        console.log(`创建新页面 ${pageId} 的数据，使用当前设置:`, defaultData);
+        
         // 返回深拷贝的对象，确保每个页面数据完全独立
         return JSON.parse(JSON.stringify(defaultData));
     }
@@ -65,6 +95,15 @@ class PDFNavigation {
             console.error('PDF Navigation container not found');
             return;
         }
+        
+        // 清除可能存在的静态HTML内容（包括静态的删除按钮）
+        const thumbnailsContainer = this.container.querySelector('#pageThumbnails');
+        if (thumbnailsContainer) {
+            thumbnailsContainer.innerHTML = '';
+        }
+        
+        // 重新创建第一页的缩略图
+        this.createThumbnail(1);
         
         this.bindEvents();
         this.updateDisplay();
@@ -85,6 +124,10 @@ class PDFNavigation {
         if (thumbnailsContainer) {
             thumbnailsContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('delete-page-btn')) {
+                    // 阻止事件冒泡，防止触发页面切换
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
                     const pageNum = parseInt(e.target.dataset.page);
                     this.deletePage(pageNum);
                 } else if (e.target.closest('.page-thumbnail')) {
@@ -128,40 +171,66 @@ class PDFNavigation {
      * 删除页面
      */
     deletePage(pageNum) {
+        // 首先验证页面数量
         if (this.totalPages <= 1) {
             alert('至少需要保留一页');
-            return;
+            return false;
         }
         
+        // 验证页面编号是否有效
+        if (pageNum < 1 || pageNum > this.totalPages) {
+            console.error(`无效的页面编号: ${pageNum}`);
+            return false;
+        }
+        
+        // 检查页面是否存在
+        const pageExists = this.pages.some(page => page.id === pageNum);
+        if (!pageExists) {
+            console.error(`页面 ${pageNum} 不存在`);
+            return false;
+        }
+        
+        // 显示确认对话框
         if (confirm(`确定要删除第 ${pageNum} 页吗？`)) {
-            // 从页面数据中移除
-            this.pages = this.pages.filter(page => page.id !== pageNum);
-            
-            // 移除缩略图
-            const thumbnail = this.container.querySelector(`[data-page="${pageNum}"]`);
-            if (thumbnail) {
-                thumbnail.remove();
+            try {
+                // 用户确认删除，开始执行删除操作
+                
+                // 从页面数据中移除
+                this.pages = this.pages.filter(page => page.id !== pageNum);
+                
+                // 移除缩略图
+                const thumbnail = this.container.querySelector(`[data-page="${pageNum}"]`);
+                if (thumbnail) {
+                    thumbnail.remove();
+                }
+                
+                // 更新页面编号
+                this.reorderPages();
+                
+                // 如果删除的是当前页面，切换到第一页
+                if (this.currentPage === pageNum) {
+                    this.switchToPage(1);
+                } else if (this.currentPage > pageNum) {
+                    this.currentPage--;
+                }
+                
+                this.totalPages--;
+                this.updateDisplay();
+                
+                // 触发回调
+                if (this.onPageDeleteCallback) {
+                    this.onPageDeleteCallback(pageNum);
+                }
+                
+                return true;
+            } catch (error) {
+                console.error(`删除页面 ${pageNum} 时发生错误:`, error);
+                alert(`删除页面时发生错误，请重试`);
+                return false;
             }
-            
-            // 更新页面编号
-            this.reorderPages();
-            
-            // 如果删除的是当前页面，切换到第一页
-            if (this.currentPage === pageNum) {
-                this.switchToPage(1);
-            } else if (this.currentPage > pageNum) {
-                this.currentPage--;
-            }
-            
-            this.totalPages--;
-            this.updateDisplay();
-            
-            // 触发回调
-            if (this.onPageDeleteCallback) {
-                this.onPageDeleteCallback(pageNum);
-            }
-            
-            console.log(`删除了第 ${pageNum} 页`);
+        } else {
+            // 用户取消删除，不做任何操作
+            return false;
         }
     }
     
@@ -233,6 +302,9 @@ class PDFNavigation {
         
         const thumbnail = document.createElement('div');
         thumbnail.className = 'page-thumbnail';
+        if (pageNum === this.currentPage) {
+            thumbnail.classList.add('active');
+        }
         thumbnail.dataset.page = pageNum;
         
         thumbnail.innerHTML = `
@@ -244,6 +316,7 @@ class PDFNavigation {
             </div>
         `;
         
+        console.log(`创建了页面 ${pageNum} 的缩略图`);
         thumbnailsContainer.appendChild(thumbnail);
     }
     
