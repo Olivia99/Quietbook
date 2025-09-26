@@ -1480,8 +1480,28 @@ function autoSaveCurrentPageState() {
             // 验证保存后的页面数据
             const savedPageData = pdfNavigation.getPageData(pdfNavigation.getCurrentPage());
             console.log('保存后的页面数据:', savedPageData);
+            
+            // 更新当前页面的缩略图
+            updateCurrentPageThumbnail();
         }
     }, 50);
+}
+
+/**
+ * 更新当前页面的缩略图
+ */
+function updateCurrentPageThumbnail() {
+    if (!pdfNavigation) return;
+    
+    // 延迟更新缩略图，确保页面内容已完全渲染
+    setTimeout(async () => {
+        try {
+            await pdfNavigation.updateCurrentThumbnail();
+            console.log('当前页面缩略图已更新');
+        } catch (error) {
+            console.error('更新缩略图失败:', error);
+        }
+    }, 200);
 }
 
 /**

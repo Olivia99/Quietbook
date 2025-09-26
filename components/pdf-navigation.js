@@ -116,7 +116,7 @@ class PDFNavigation {
         // 添加页面按钮
         const addPageBtn = this.container.querySelector('#addPageBtn');
         if (addPageBtn) {
-            addPageBtn.addEventListener('click', () => this.addPage());
+            addPageBtn.addEventListener('click', async () => await this.addPage());
         }
         
         // 页面缩略图点击事件（事件委托）
@@ -151,7 +151,7 @@ class PDFNavigation {
     /**
      * 添加新页面
      */
-    addPage() {
+    async addPage() {
         this.totalPages++;
         const newPageId = this.totalPages;
         
@@ -160,7 +160,7 @@ class PDFNavigation {
         this.pages.push(newPageData);
         
         // 创建新的缩略图
-        this.createThumbnail(newPageId);
+        await this.createThumbnail(newPageId);
         
         // 切换到新页面
         this.switchToPage(newPageId);
@@ -294,9 +294,17 @@ class PDFNavigation {
     /**
      * 创建页面缩略图
      */
-    createThumbnail(pageNum) {
+    async createThumbnail(pageNum) {
         const thumbnailsContainer = this.container.querySelector('#pageThumbnails');
         if (!thumbnailsContainer) return;
+        
+        // 获取页面数据以确定纸张尺寸和方向
+        const pageData = this.getPageData(pageNum);
+        const paperSize = pageData?.paperSize || 'a4';
+        const orientation = pageData?.orientation || 'portrait';
+        
+        // 计算缩略图尺寸，保持纸张比例
+        const { width: thumbnailWidth, height: thumbnailHeight } = this.calculateThumbnailSize(paperSize, orientation);
         
         const thumbnail = document.createElement('div');
         thumbnail.className = 'page-thumbnail';
@@ -305,9 +313,15 @@ class PDFNavigation {
         }
         thumbnail.dataset.page = pageNum;
         
+        // 设置缩略图尺寸
+        thumbnail.style.width = `${thumbnailWidth}px`;
+        thumbnail.style.height = `${thumbnailHeight}px`;
+        
         thumbnail.innerHTML = `
-            <div class="page-preview-mini">
-                <span class="page-number">${pageNum}</span>
+            <div class="page-preview-mini" style="width: 100%; height: 100%; position: relative;">
+                <canvas class="thumbnail-canvas" width="${thumbnailWidth * 2}" height="${thumbnailHeight * 2}" 
+                        style="width: 100%; height: 100%; object-fit: contain;"></canvas>
+                <div class="page-number-overlay">${pageNum}</div>
             </div>
             <div class="page-actions">
                 <button class="delete-page-btn" title="删除页面" data-page="${pageNum}">×</button>
@@ -316,6 +330,158 @@ class PDFNavigation {
         
         console.log(`创建了页面 ${pageNum} 的缩略图`);
         thumbnailsContainer.appendChild(thumbnail);
+        
+        // 生成缩略图内容
+        await this.generateThumbnailContent(pageNum);
+    }
+    
+    /**
+     * 计算缩略图尺寸，保持纸张比例
+     */
+    calculateThumbnailSize(paperSize, orientation) {
+        // 定义纸张尺寸比例
+        const paperRatios = {
+            'a4': { width: 210, height: 297 },
+            'letter': { width: 216, height: 279 }
+        };
+        
+        const ratio = paperRatios[paperSize] || paperRatios['a4'];
+        let width = ratio.width;
+        let height = ratio.height;
+        
+        // 根据方向调整
+        if (orientation === 'landscape') {
+            [width, height] = [height, width];
+        }
+        
+        // 缩放到合适的缩略图尺寸（最大宽度80px）
+        const maxWidth = 80;
+        const scale = maxWidth / width;
+        
+        return {
+            width: Math.round(width * scale),
+            height: Math.round(height * scale)
+        };
+    }
+    
+    /**
+     * 生成缩略图内容
+     */
+    async generateThumbnailContent(pageNum) {
+        try {
+            const thumbnail = this.container.querySelector(`[data-page="${pageNum}"]`);
+            if (!thumbnail) return;
+            
+            const canvas = thumbnail.querySelector('.thumbnail-canvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // 保存当前页面状态
+            const originalCurrentPage = this.currentPage;
+            const needsPageSwitch = pageNum !== this.currentPage;
+            
+            if (needsPageSwitch) {
+                // 临时切换到目标页面以获取其内容
+                await this.switchToPageForThumbnail(pageNum);
+            }
+            
+            // 等待页面渲染
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // 获取paper-preview元素
+            const paperPreview = document.getElementById('paperPreview');
+            if (!paperPreview) {
+                this.drawPlaceholderThumbnail(ctx, canvas.width, canvas.height, pageNum);
+                return;
+            }
+            
+            // 使用html2canvas截取paper-preview内容
+            if (typeof html2canvas !== 'undefined') {
+                const previewCanvas = await html2canvas(paperPreview, {
+                    backgroundColor: '#ffffff',
+                    scale: 1,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    width: paperPreview.offsetWidth,
+                    height: paperPreview.offsetHeight
+                });
+                
+                // 将截图绘制到缩略图canvas上
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(previewCanvas, 0, 0, canvas.width, canvas.height);
+            } else {
+                this.drawPlaceholderThumbnail(ctx, canvas.width, canvas.height, pageNum);
+            }
+            
+            // 恢复原始页面
+            if (needsPageSwitch && originalCurrentPage !== pageNum) {
+                await this.switchToPageForThumbnail(originalCurrentPage);
+            }
+            
+        } catch (error) {
+            console.error(`生成页面 ${pageNum} 缩略图失败:`, error);
+            // 绘制错误占位符
+            const thumbnail = this.container.querySelector(`[data-page="${pageNum}"]`);
+            if (thumbnail) {
+                const canvas = thumbnail.querySelector('.thumbnail-canvas');
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    this.drawPlaceholderThumbnail(ctx, canvas.width, canvas.height, pageNum);
+                }
+            }
+        }
+    }
+    
+    /**
+     * 为缩略图切换页面（不触发回调）
+     */
+    async switchToPageForThumbnail(pageNum) {
+        if (pageNum < 1 || pageNum > this.totalPages) return;
+        
+        const pageData = this.getPageData(pageNum);
+        if (pageData && typeof window.applyPageDataToDisplay === 'function') {
+            window.applyPageDataToDisplay(pageData);
+        }
+    }
+    
+    /**
+     * 绘制占位符缩略图
+     */
+    drawPlaceholderThumbnail(ctx, width, height, pageNum) {
+        // 清除画布
+        ctx.clearRect(0, 0, width, height);
+        
+        // 绘制背景
+        ctx.fillStyle = '#f8f9fa';
+        ctx.fillRect(0, 0, width, height);
+        
+        // 绘制边框
+        ctx.strokeStyle = '#dee2e6';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(1, 1, width - 2, height - 2);
+        
+        // 绘制页面编号
+        ctx.fillStyle = '#495057';
+        ctx.font = `${Math.min(width, height) * 0.2}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(pageNum.toString(), width / 2, height / 2);
+    }
+    
+    /**
+     * 更新缩略图内容
+     */
+    async updateThumbnail(pageNum) {
+        await this.generateThumbnailContent(pageNum);
+    }
+    
+    /**
+     * 更新当前页面的缩略图
+     */
+    async updateCurrentThumbnail() {
+        await this.updateThumbnail(this.currentPage);
     }
     
     /**
