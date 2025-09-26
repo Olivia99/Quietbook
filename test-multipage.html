@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多页面独立装饰功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-step {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .test-step h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-step ol {
+            margin: 10px 0;
+        }
+        .test-step li {
+            margin: 5px 0;
+        }
+        .expected-result {
+            background-color: #e8f5e8;
+            padding: 10px;
+            border-left: 4px solid #4CAF50;
+            margin-top: 10px;
+        }
+        .app-link {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .app-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>多页面独立装饰功能测试指南</h1>
+        
+        <a href="index.html" class="app-link" target="_blank">打开安静书制作工具</a>
+        
+        <div class="test-step">
+            <h3>测试步骤 1: 基础多页面功能</h3>
+            <ol>
+                <li>打开应用程序</li>
+                <li>点击"添加页面"按钮，创建第二个页面</li>
+                <li>再次点击"添加页面"，创建第三个页面</li>
+                <li>观察页面导航区域是否显示3个页面缩略图</li>
+                <li>点击不同的页面缩略图进行切换</li>
+            </ol>
+            <div class="expected-result">
+                <strong>预期结果:</strong> 应该能够成功创建多个页面，并且可以在页面之间自由切换。
+            </div>
+        </div>
+
+        <div class="test-step">
+            <h3>测试步骤 2: 独立模板设置</h3>
+            <ol>
+                <li>在第1页，选择"基础房间"模板</li>
+                <li>切换到第2页，选择"双房间"模板</li>
+                <li>切换到第3页，保持"基础房间"模板</li>
+                <li>在页面之间切换，观察模板是否保持独立</li>
+            </ol>
+            <div class="expected-result">
+                <strong>预期结果:</strong> 每个页面应该保持其独立的模板设置，切换页面时模板不会相互影响。
+            </div>
+        </div>
+
+        <div class="test-step">
+            <h3>测试步骤 3: 独立纸张设置</h3>
+            <ol>
+                <li>在第1页，设置纸张为A4，竖向</li>
+                <li>切换到第2页，设置纸张为A3，横向</li>
+                <li>切换到第3页，设置纸张为A5，竖向</li>
+                <li>在页面之间切换，观察纸张设置是否保持独立</li>
+            </ol>
+            <div class="expected-result">
+                <strong>预期结果:</strong> 每个页面应该保持其独立的纸张尺寸和方向设置。
+            </div>
+        </div>
+
+        <div class="test-step">
+            <h3>测试步骤 4: 独立装饰设置（基础房间）</h3>
+            <ol>
+                <li>切换到第1页（基础房间模板）</li>
+                <li>选择一个壁纸（例如：壁纸1）</li>
+                <li>选择一个地板（例如：地板1）</li>
+                <li>设置踢脚线颜色</li>
+                <li>切换到第3页（也是基础房间模板）</li>
+                <li>选择不同的壁纸和地板</li>
+                <li>在第1页和第3页之间切换，观察装饰是否保持独立</li>
+            </ol>
+            <div class="expected-result">
+                <strong>预期结果:</strong> 第1页和第3页应该保持各自独立的装饰设置，互不影响。
+            </div>
+        </div>
+
+        <div class="test-step">
+            <h3>测试步骤 5: 独立装饰设置（双房间）</h3>
+            <ol>
+                <li>切换到第2页（双房间模板）</li>
+                <li>在房间1中设置壁纸和地板</li>
+                <li>切换到房间2，设置不同的壁纸和地板</li>
+                <li>设置踢脚线颜色</li>
+                <li>切换到其他页面，再回到第2页</li>
+                <li>检查双房间的装饰设置是否保持</li>
+                <li>检查房间切换状态是否保持</li>
+            </ol>
+            <div class="expected-result">
+                <strong>预期结果:</strong> 双房间模板的每个房间装饰设置应该独立保存，页面切换后能正确恢复。
+            </div>
+        </div>
+
+        <div class="test-step">
+            <h3>测试步骤 6: 综合测试</h3>
+            <ol>
+                <li>为每个页面设置完全不同的配置：
+                    <ul>
+                        <li>第1页：A4竖向，基础房间，壁纸1，地板1</li>
+                        <li>第2页：A3横向，双房间，房间1用壁纸2+地板2，房间2用壁纸3+地板3</li>
+                        <li>第3页：A5竖向，基础房间，壁纸4，地板4</li>
+                    </ul>
+                </li>
+                <li>快速在页面之间切换多次</li>
+                <li>验证每个页面的所有设置都能正确保持和恢复</li>
+            </ol>
+            <div class="expected-result">
+                <strong>预期结果:</strong> 所有页面的所有设置（模板、纸张、装饰）都应该完全独立，切换时能正确保存和恢复。
+            </div>
+        </div>
+
+        <div class="test-step">
+            <h3>测试步骤 7: 页面删除测试</h3>
+            <ol>
+                <li>删除第2页</li>
+                <li>验证剩余页面的设置是否保持正确</li>
+                <li>验证页面编号是否正确更新</li>
+            </ol>
+            <div class="expected-result">
+                <strong>预期结果:</strong> 删除页面后，其他页面的设置不应受影响，页面编号应正确更新。
+            </div>
+        </div>
+
+        <h2>测试完成标准</h2>
+        <p>如果以上所有测试步骤都能按预期结果执行，则说明多页面独立装饰功能实现成功。</p>
+        
+        <h2>常见问题排查</h2>
+        <ul>
+            <li><strong>页面切换时装饰丢失:</strong> 检查状态保存和恢复逻辑</li>
+            <li><strong>模板切换异常:</strong> 检查模板ID是否正确</li>
+            <li><strong>纸张设置不保持:</strong> 检查纸张尺寸和方向的保存逻辑</li>
+            <li><strong>双房间状态异常:</strong> 检查房间状态的保存和应用逻辑</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电子安静书制作工具</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 模板样式文件 -->
+    <link rel="stylesheet" href="templates/styles/basic-room-template.css">
+    <link rel="stylesheet" href="templates/styles/dual-room-template.css">
+    <!-- PDF导航组件样式 -->
+    <link rel="stylesheet" href="components/pdf-navigation.css">
+    <!-- PDF导出相关库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧预览区域 -->
+        <div class="preview-section">
+            <h2>纸张预览</h2>
+            
+            <!-- 房间切换tab（仅双房间模板时显示） -->
+            <div class="room-tabs" id="roomTabs" style="display: none;">
+                <button class="room-tab active" data-room="1">房间1</button>
+                <button class="room-tab" data-room="2">房间2</button>
+            </div>
+            
+            <div class="preview-container">
+                <!-- 纸张预览 - 包含模板 -->
+                <div id="paperPreview" class="paper-preview letter landscape">
+                    <!-- 模板容器 - 100%填充纸张 -->
+                    <div id="templateContainer" class="template-container">
+                        <!-- 模板内容将在这里动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- PDF页面导航组件容器 -->
+                <div id="pdfNavigationContainer"></div>
+            </div>
+        </div>
+
+        <!-- 右侧选项面板 -->
+        <div class="options-section">
+            <h2>设置选项</h2>
+            
+            <!-- 主标签页导航 -->
+            <div class="main-tabs">
+                <button class="main-tab active" data-tab="paper">纸张设置</button>
+                <button class="main-tab" data-tab="decoration">装修</button>
+            </div>
+            
+            <!-- 纸张设置标签页内容 -->
+            <div class="tab-content active" id="paper-tab">
+                <!-- 模板选择 -->
+                <div class="option-group">
+                    <h3>模板选择</h3>
+                    <div class="template-selector">
+                        <select id="templateSelect" class="template-dropdown">
+                            <option value="basic-room">基础房间</option>
+                            <option value="dual-room">双房间</option>
+                            <!-- 更多模板将在这里添加 -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="option-group">
+                    <div class="paper-settings-compact">
+                        <!-- 第一行：尺寸和方向 -->
+                        <div class="settings-row">
+                            <div class="setting-group">
+                                <label class="setting-label">尺寸</label>
+                                <div class="button-group compact">
+                                    <input type="radio" name="paperSize" value="letter" id="size-letter" checked>
+                                    <label for="size-letter" class="btn-toggle">Letter</label>
+                                    <input type="radio" name="paperSize" value="a4" id="size-a4">
+                                    <label for="size-a4" class="btn-toggle">A4</label>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-group">
+                                <label class="setting-label">方向</label>
+                                <div class="button-group compact">
+                                    <input type="radio" name="orientation" value="portrait" id="orient-portrait" checked>
+                                    <label for="orient-portrait" class="btn-toggle">
+                                        <span class="icon">📄</span>竖向
+                                    </label>
+                                    <input type="radio" name="orientation" value="landscape" id="orient-landscape">
+                                    <label for="orient-landscape" class="btn-toggle">
+                                        <span class="icon">📃</span>横向
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 装修标签页内容 -->
+            <div class="tab-content" id="decoration-tab">
+                <!-- 装修横向标签 -->
+                <div class="decoration-tabs">
+                    <button class="decoration-tab active" data-decoration="home">🏠 家装</button>
+                    <button class="decoration-tab" data-decoration="character">👤 人物</button>
+                </div>
+                
+                <!-- 家装内容 -->
+                <div class="decoration-content active" id="home-decoration">
+                    <!-- 家装子标签 -->
+                    <div class="home-subtabs">
+                        <button class="home-subtab active" data-room="bedroom">🛏️ 卧室</button>
+                        <button class="home-subtab" data-room="bathroom">🚿 厕所</button>
+                        <button class="home-subtab" data-room="kitchen">🍳 厨房</button>
+                        <button class="home-subtab" data-room="living">🛋️ 客厅</button>
+                        <button class="home-subtab" data-room="game">🎮 游戏房</button>
+                        <button class="home-subtab" data-room="outdoor">🌳 户外</button>
+                        <button class="home-subtab" data-room="soft">🎨 软装</button>
+                    </div>
+                    
+                    <!-- 房间内容区域 -->
+                    <div class="room-content active" id="bedroom-content">
+                        <p>卧室装修选项</p>
+                    </div>
+                    <div class="room-content" id="bathroom-content">
+                        <p>厕所装修选项</p>
+                    </div>
+                    <div class="room-content" id="kitchen-content">
+                        <p>厨房装修选项</p>
+                    </div>
+                    <div class="room-content" id="living-content">
+                        <p>客厅装修选项</p>
+                    </div>
+                    <div class="room-content" id="game-content">
+                        <p>游戏房装修选项</p>
+                    </div>
+                    <div class="room-content" id="outdoor-content">
+                        <p>户外装修选项</p>
+                    </div>
+                    
+                    <!-- 软装内容 -->
+                    <div class="room-content" id="soft-content">
+                        <!-- 软装二级标签 -->
+                        <div class="soft-tabs">
+                            <button class="soft-tab active" data-soft="floor">🏠 地板</button>
+                            <button class="soft-tab" data-soft="wallpaper">🎨 墙纸</button>
+                            <button class="soft-tab" data-soft="baseboard">📏 踢脚线</button>
+                        </div>
+                        
+                        <!-- 地板内容 -->
+                        <div class="soft-content active" id="floor-content">
+                            <p>地板选项</p>
+                        </div>
+                        
+                        <!-- 墙纸内容 -->
+                        <div class="soft-content" id="wallpaper-content">
+                            <div class="wallpaper-grid" id="wallpaper-grid">
+                                <!-- 墙纸将通过JavaScript动态加载 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 踢脚线内容 -->
+                        <div class="soft-content" id="baseboard-content">
+                            <h4>踢脚线颜色设置</h4>
+                            <div class="baseboard-controls">
+                                <div class="color-control">
+                                    <label for="baseboard-border-color">边框颜色:</label>
+                                    <input type="color" id="baseboard-border-color" value="#000000">
+                                    <span class="color-preview" id="border-color-preview"></span>
+                                </div>
+                                <div class="color-control">
+                                    <label for="baseboard-fill-color">填充颜色:</label>
+                                    <input type="color" id="baseboard-fill-color" value="#D9D9D9">
+                                    <span class="color-preview" id="fill-color-preview"></span>
+                                </div>
+                                <button id="apply-baseboard-colors" class="btn btn-primary">应用踢脚线颜色</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 人物内容 -->
+                <div class="decoration-content" id="character-decoration">
+                    <p>人物装修选项</p>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="action-buttons">
+                <button id="addPageBtn" class="btn btn-primary">添加新页面</button>
+                <button id="saveBtn" class="btn btn-secondary">保存项目</button>
+                <button id="exportBtn" class="btn btn-success">导出PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模板文件 -->
+    <script src="templates/room-template-base.js"></script>
+    <script src="templates/basic-room-template.js"></script>
+    <script src="templates/dual-room-template.js"></script>
+    
+    <!-- PDF导航组件 -->
+    <script src="components/pdf-navigation.js"></script>
+    
+    <!-- 主程序 -->
+    <script src="script.js"></script>
+</body>
+</html>

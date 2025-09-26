@@ -1,0 +1,27 @@
+{
+  "name": "quiet-book-maker",
+  "version": "1.0.0",
+  "description": "电子安静书制作工具 - 一个帮助制作儿童安静书的在线工具",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo 'Static site - no build needed'",
+    "dev": "npx serve . -l 3000"
+  },
+  "keywords": [
+    "quiet-book",
+    "children",
+    "education",
+    "interactive",
+    "pdf",
+    "maker"
+  ],
+  "author": "Vibe Coding",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

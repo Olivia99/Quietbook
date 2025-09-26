@@ -1,0 +1,986 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    width: 100vw;
+    color: #333;
+    overflow-x: auto;
+}
+
+.container {
+    width: 100vw;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    gap: 30px;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* 头部样式 */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 300;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* 主要内容区域 */
+.main-content {
+    display: flex;
+    gap: 30px;
+    min-height: 70vh;
+}
+
+/* 标签页系统样式 */
+.main-tabs {
+    display: flex;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
+.main-tab {
+    flex: 1;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.main-tab:hover {
+    color: #475569;
+    background: #f8fafc;
+}
+
+.main-tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+    background: #f0f4ff;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* 装修标签页样式 */
+.decoration-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 4px;
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+
+.decoration-tab {
+    flex: 1;
+    padding: 10px 12px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.decoration-tab:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.decoration-tab.active {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.decoration-content {
+    display: none;
+}
+
+.decoration-content.active {
+    display: block;
+}
+
+/* 家装子标签样式 */
+.home-subtabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+    padding: 8px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.home-subtab {
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #64748b;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.home-subtab:hover {
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+}
+
+.home-subtab.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.room-content {
+    display: none;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    min-height: 200px;
+}
+
+.room-content.active {
+    display: block;
+}
+
+/* 软装二级标签样式 */
+.soft-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.soft-tab {
+    padding: 8px 16px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.soft-tab:hover {
+    background: #e2e8f0;
+}
+
+.soft-tab.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.soft-content {
+    display: none;
+}
+
+.soft-content.active {
+    display: block;
+}
+
+/* 墙纸网格样式 */
+.wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 8px;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+/* 踢脚线颜色控制样式 */
+.baseboard-controls {
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.baseboard-controls h4 {
+    margin: 0 0 16px 0;
+    color: #334155;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.color-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.color-control label {
+    min-width: 80px;
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 500;
+}
+
+.color-control input[type="color"] {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: none;
+}
+
+.color-control input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 6px;
+}
+
+.color-control input[type="color"]::-webkit-color-swatch {
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+}
+
+.color-preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    display: inline-block;
+}
+
+#apply-baseboard-colors {
+    width: 100%;
+    padding: 12px 24px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#apply-baseboard-colors:hover {
+    background: #5a67d8;
+}
+
+#apply-baseboard-colors:active {
+    background: #4c51bf;
+}
+
+.wallpaper-item {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    background: white;
+}
+
+.wallpaper-item:hover {
+    border-color: #cbd5e1;
+    transform: scale(1.05);
+}
+
+.wallpaper-item.selected {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.wallpaper-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wallpaper-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 2px 4px;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 0 0 4px 4px;
+}
+
+
+
+.room-preview {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* 模板相关样式已移动到单独的CSS文件中 */
+
+/* 地板选择器样式 */
+.floor-grid {
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.floor-grid h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 16px;
+    text-align: center;
+}
+
+.floor-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 8px;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+.floor-option {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    background: white;
+}
+
+.floor-option:hover {
+    border-color: #cbd5e1;
+    transform: scale(1.05);
+}
+
+.floor-option.selected {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.floor-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.floor-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 2px 4px;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 0 0 4px 4px;
+}
+
+.floor-content {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.area-label {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
+/* 双房间模板样式已移动到单独的CSS文件中 */
+
+/* 左侧预览区域 */
+.preview-section {
+    flex: 2;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.preview-section h2 {
+    margin-bottom: 20px;
+    color: #4a5568;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 1400px;
+    padding: 20px;
+    background: #f7fafc;
+    border-radius: 10px;
+    overflow: auto;
+}
+
+/* 纸张预览样式 */
+.paper-preview {
+    background: white;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 模板容器 - 100%填充纸张 */
+.template-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Letter 尺寸 (8.5" × 11") - 竖向 - 2倍大小 */
+.paper-preview.letter.portrait {
+    width: 680px;  /* 8.5 * 40px * 2 */
+    height: 880px; /* 11 * 40px * 2 */
+}
+
+/* Letter 尺寸 (8.5" × 11") - 横向 - 2倍大小 */
+.paper-preview.letter.landscape {
+    width: 880px;  /* 11 * 40px * 2 */
+    height: 680px; /* 8.5 * 40px * 2 */
+}
+
+/* A4 尺寸 (210mm × 297mm) - 竖向 - 2倍大小 */
+.paper-preview.a4.portrait {
+    width: 630px;   /* 210mm 按比例缩放 * 2 */
+    height: 890px; /* 297mm 按比例缩放 * 2 */
+}
+
+/* A4 尺寸 (210mm × 297mm) - 横向 - 2倍大小 */
+.paper-preview.a4.landscape {
+    width: 890px;  /* 297mm 按比例缩放 * 2 */
+    height: 630px;  /* 210mm 按比例缩放 * 2 */
+}
+
+/* 默认竖向样式（向后兼容） */
+.paper-preview.letter:not(.landscape):not(.portrait) {
+    width: 680px;  /* 8.5 * 40px * 2 */
+    height: 880px; /* 11 * 40px * 2 */
+}
+
+.paper-preview.a4:not(.landscape):not(.portrait) {
+    width: 630px;   /* 210mm 按比例缩放 * 2 */
+    height: 890px; /* 297mm 按比例缩放 * 2 */
+}
+
+.paper-content {
+    padding: 60px;  /* 30px * 2 - 默认正常边距 */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+
+
+.paper-content h3 {
+    color: #2d3748;
+    margin-bottom: 30px;  /* 15px * 2 */
+    font-size: 2.4rem;    /* 1.2rem * 2 */
+    text-align: center;
+}
+
+.paper-content p {
+    color: #718096;
+    margin-bottom: 40px;  /* 20px * 2 */
+    text-align: center;
+    font-size: 1.8rem;    /* 0.9rem * 2 */
+}
+
+.placeholder-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;  /* 15px * 2 */
+}
+
+.activity-box {
+    border: 4px dashed #cbd5e0;  /* 2px * 2 */
+    border-radius: 16px;         /* 8px * 2 */
+    padding: 30px;               /* 15px * 2 */
+    flex: 1;
+    min-height: 160px;           /* 80px * 2 */
+}
+
+.activity-title {
+    font-size: 1.6rem;           /* 0.8rem * 2 */
+    color: #a0aec0;
+    margin-bottom: 16px;         /* 8px * 2 */
+    font-weight: 500;
+}
+
+.activity-area {
+    background: #f7fafc;
+    border-radius: 8px;         /* 4px * 2 */
+    height: 120px;               /* 60px * 2 */
+    border: 2px solid #e2e8f0;   /* 1px * 2 */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;                   /* 10px * 2 */
+    padding: 20px;               /* 10px * 2 */
+}
+
+.activity-item {
+    background: #e2e8f0;
+    border-radius: 8px;         /* 4px * 2 */
+    padding: 20px;               /* 10px * 2 */
+    text-align: center;
+    font-size: 1.4rem;           /* 0.7rem * 2 */
+    color: #4a5568;
+    border: 2px solid #cbd5e0;   /* 1px * 2 */
+}
+
+/* 右侧选项区域 */
+.options-section {
+    flex: 1;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    height: fit-content;
+}
+
+.options-section h2 {
+    margin-bottom: 25px;
+    color: #4a5568;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+/* 选项组样式 */
+.option-group {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+}
+
+.option-group h3 {
+    margin-bottom: 15px;
+    color: #2d3748;
+    font-size: 1.1rem;
+}
+
+/* 模板选择器样式 */
+.template-selector {
+    margin-top: 10px;
+}
+
+.template-dropdown {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #2d3748;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.template-dropdown:hover {
+    border-color: #667eea;
+}
+
+.template-dropdown:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* 紧凑纸张设置样式 */
+.paper-settings-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settings-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.setting-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.setting-group.full-width {
+    flex: 1;
+}
+
+.setting-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.button-group {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    background: white;
+}
+
+.button-group.compact {
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.button-group input[type="radio"] {
+    display: none;
+}
+
+.btn-toggle {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #4a5568;
+    background: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-right: 1px solid #e2e8f0;
+}
+
+.btn-toggle:last-child {
+    border-right: none;
+}
+
+.btn-toggle:hover {
+    background: #f0f4ff;
+    color: #667eea;
+}
+
+.button-group input[type="radio"]:checked + .btn-toggle {
+    background: #667eea;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-toggle .icon {
+    font-size: 0.9rem;
+}
+
+/* 保留原有样式作为备用 */
+.paper-size-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.radio-option:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.radio-option input[type="radio"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+    accent-color: #667eea;
+}
+
+.radio-option input[type="radio"]:checked + .radio-label {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.radio-label {
+    font-size: 0.95rem;
+    color: #4a5568;
+    transition: color 0.2s ease;
+}
+
+/* 选择框样式 */
+.select-option {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.95rem;
+    color: #4a5568;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.select-option:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.select-option:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* 设置项样式 */
+.setting-item {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.setting-item label {
+    font-weight: 500;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.setting-item select {
+    padding: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+}
+
+.setting-item select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* 按钮样式 */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e0;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .main-content {
+        flex-direction: column;
+    }
+    
+    .preview-section {
+        order: 2;
+    }
+    
+    .options-section {
+        order: 1;
+    }
+    
+    /* 保持固定尺寸，不受屏幕大小影响 */
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+        flex-direction: column;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .preview-section,
+    .options-section {
+        padding: 20px;
+    }
+    
+    /* 保持固定尺寸，不受屏幕大小影响 */
+    
+    .action-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .left-panel, .right-panel {
+        width: 100%;
+        max-width: none;
+    }
+    
+    .category-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+    
+    .wallpaper-grid {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    }
+    
+
+    
+    /* 保持固定尺寸，不受屏幕大小影响 */
+    
+    .floor-options {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 8px;
+    }
+    
+    .floor-option {
+        height: 60px;
+    }
+    
+    .floor-name {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* 保持固定尺寸，不受屏幕大小影响 */
+    
+    .area-label {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+    
+    .floor-options {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    }
+}
+
+/* 基础房间模板样式已移动到单独的CSS文件中 */
+
+/* 房间切换tab样式（桌面控件） */
+.room-tabs {
+    display: flex;
+    margin: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.room-tab {
+    padding: 8px 16px;
+    border: none;
+    background: #f5f5f5;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    margin-right: 2px;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.room-tab:hover {
+    background: #e0e0e0;
+}
+
+.room-tab.active {
+    background: #007bff;
+    color: white;
+}

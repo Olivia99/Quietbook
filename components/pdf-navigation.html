@@ -1,0 +1,22 @@
+<!-- PDF页面导航组件 -->
+<div class="page-navigation" id="pageNavigation">
+    <div class="page-nav-header">
+        <span class="page-count-info">
+            第 <span id="currentPageNumber">1</span> 页，共 <span id="totalPageCount">1</span> 页
+        </span>
+        <button id="addPageBtn" class="add-page-btn" title="添加新页面">
+            <span class="add-icon">+</span> 添加页面
+        </button>
+    </div>
+    <div class="page-thumbnails" id="pageThumbnails">
+        <!-- 页面缩略图将在这里动态生成 -->
+        <div class="page-thumbnail active" data-page="1">
+            <div class="page-preview-mini">
+                <span class="page-number">1</span>
+            </div>
+            <div class="page-actions">
+                <button class="delete-page-btn" title="删除页面" data-page="1">×</button>
+            </div>
+        </div>
+    </div>
+</div>

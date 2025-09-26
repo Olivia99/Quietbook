@@ -1,0 +1,91 @@
+/* 基础房间模板样式 */
+
+/* 房间容器基础样式 */
+.room-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 基础房间容器特定样式 */
+.basic-room-container {
+    border: 6px solid black;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+}
+
+/* 墙纸区域（红色） */
+.wallpaper-area {
+    flex: 3;
+    background: #ff5757;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="wallpaper-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="%23ff5757"/><circle cx="10" cy="10" r="2" fill="%23ff3030"/></pattern></defs><rect width="100" height="100" fill="url(%23wallpaper-pattern)"/></svg>');
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-image 0.3s ease;
+}
+
+.wallpaper-content {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* 踢脚线区域（两个div组成） */
+.baseboard-area {
+    flex: 0.126;  /* 调整为占房间高度的3% */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 踢脚线第一个div */
+.baseboard-top {
+    flex: 0.5;
+    border-top: 3px solid #000;
+    background: #D9D9D9;
+}
+
+/* 踢脚线第二个div */
+.baseboard-bottom {
+    flex: 1;
+    border-top: 3px solid #000;
+    border-bottom: 3px solid #000;
+    background: #D9D9D9;
+}
+
+/* 地板区域（绿色） */
+.floor-area {
+    flex: 1;
+    background: #48bb78;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="floor-pattern" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse"><rect width="25" height="25" fill="%2348bb78"/><rect x="0" y="0" width="25" height="2" fill="%2338a169"/><rect x="0" y="23" width="25" height="2" fill="%2338a169"/></pattern></defs><rect width="100" height="100" fill="url(%23floor-pattern)"/></svg>');
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-image 0.3s ease;
+}
+
+/* 横向布局特殊样式 */
+.room-container.horizontal .wallpaper-area {
+    flex: 2;
+}
+
+.room-container.horizontal .baseboard-area {
+    flex: 0.095;  /* 在横向布局中调整为占房间高度的3% */
+}
+
+.room-container.horizontal .floor-area {
+    flex: 1;
+}
+
+/* 响应式样式 */
+@media (max-width: 480px) {
+    .wallpaper-area, .floor-area {
+        font-size: 12px;
+    }
+}

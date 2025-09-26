@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双房间模板装饰修复测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007cba;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 3px;
+        }
+        .expected {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .warning {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .info {
+            color: #007cba;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏠 双房间模板装饰修复测试指南</h1>
+    
+    <div class="test-section">
+        <h2>🔧 修复内容</h2>
+        <p>本次修复解决了双房间模板下不同页面装饰无法正确应用的问题：</p>
+        <ul>
+            <li>修复了状态保存时读取双房间模板属性的错误</li>
+            <li>修复了状态恢复时应用装饰的逻辑错误</li>
+            <li>优化了房间状态的数据结构处理</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 测试步骤</h2>
+        
+        <div class="step">
+            <h3>步骤 1: 基础设置</h3>
+            <p>1. 打开主页面 <a href="index.html" target="_blank">index.html</a></p>
+            <p>2. 选择"双房间"模板</p>
+            <p class="expected">✅ 预期：看到两个并排的房间，房间切换标签显示</p>
+        </div>
+
+        <div class="step">
+            <h3>步骤 2: 第一页装饰测试</h3>
+            <p>1. 确保在第1页</p>
+            <p>2. 选择"房间1"标签</p>
+            <p>3. 应用墙纸（例如：选择墙纸1）</p>
+            <p>4. 应用地板（例如：选择地板1）</p>
+            <p>5. 选择"房间2"标签</p>
+            <p>6. 应用不同的墙纸（例如：选择墙纸2）</p>
+            <p>7. 应用不同的地板（例如：选择地板2）</p>
+            <p class="expected">✅ 预期：两个房间显示不同的装饰</p>
+        </div>
+
+        <div class="step">
+            <h3>步骤 3: 多页面独立性测试</h3>
+            <p>1. 点击"添加页面"按钮，创建第2页</p>
+            <p>2. 确保第2页也是双房间模板</p>
+            <p>3. 在第2页的房间1应用不同的装饰（例如：墙纸3、地板3）</p>
+            <p>4. 在第2页的房间2应用不同的装饰（例如：墙纸4、地板4）</p>
+            <p class="expected">✅ 预期：第2页的装饰与第1页完全独立</p>
+        </div>
+
+        <div class="step">
+            <h3>步骤 4: 页面切换验证</h3>
+            <p>1. 切换回第1页</p>
+            <p class="expected">✅ 预期：第1页的装饰完全恢复（房间1：墙纸1+地板1，房间2：墙纸2+地板2）</p>
+            <p>2. 再次切换到第2页</p>
+            <p class="expected">✅ 预期：第2页的装饰完全恢复（房间1：墙纸3+地板3，房间2：墙纸4+地板4）</p>
+        </div>
+
+        <div class="step">
+            <h3>步骤 5: 房间选择状态测试</h3>
+            <p>1. 在第1页选择"房间2"标签</p>
+            <p>2. 切换到第2页</p>
+            <p>3. 切换回第1页</p>
+            <p class="expected">✅ 预期：第1页应该记住之前选择的"房间2"状态</p>
+        </div>
+
+        <div class="step">
+            <h3>步骤 6: 踢脚线颜色测试</h3>
+            <p>1. 在第1页房间1设置踢脚线颜色（例如：红色边框，蓝色填充）</p>
+            <p>2. 切换到房间2，设置不同的踢脚线颜色（例如：绿色边框，黄色填充）</p>
+            <p>3. 切换到第2页，为两个房间设置不同的踢脚线颜色</p>
+            <p>4. 在页面间切换验证</p>
+            <p class="expected">✅ 预期：每个页面的每个房间都能独立保持踢脚线颜色</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🐛 问题排查</h2>
+        <p class="warning">如果遇到问题，请检查：</p>
+        <ul>
+            <li>打开浏览器开发者工具（F12）查看控制台错误</li>
+            <li>确认所有装饰资源文件存在（assets/软装/wallpaper/ 和 assets/软装/floor/）</li>
+            <li>验证页面状态保存是否正常工作</li>
+        </ul>
+        
+        <p class="info">💡 调试信息：修复后的代码会在控制台输出详细的状态应用日志</p>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ 成功标准</h2>
+        <p>测试通过的标准：</p>
+        <ul>
+            <li>每个页面的每个房间都能独立保存和恢复装饰状态</li>
+            <li>页面切换时不会丢失任何装饰设置</li>
+            <li>房间选择状态在页面切换时正确保持</li>
+            <li>墙纸、地板、踢脚线颜色都能正确应用和恢复</li>
+        </ul>
+    </div>
+
+    <script>
+        // 添加一些辅助功能
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 双房间模板装饰修复测试页面已加载');
+            console.log('📝 请按照上述步骤进行测试');
+        });
+    </script>
+</body>
+</html>
