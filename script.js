@@ -1065,11 +1065,33 @@ function setupPDFNavigationCallbacks() {
     if (!pdfNavigation) return;
     
     // 页面切换回调
-    pdfNavigation.onPageChange((pageNum) => {
-        console.log(`切换到第 ${pageNum} 页`);
+    pdfNavigation.onPageChange((pageNum, oldPageNum) => {
+        console.log(`页面切换回调: 从第${oldPageNum}页切换到第${pageNum}页`);
         
-        // 保存当前页面状态并切换到新页面
-        saveCurrentPageStateAndSwitchTo(pageNum);
+        // 如果提供了oldPageNum，说明这是从PDF导航组件触发的切换
+        if (oldPageNum !== undefined) {
+            // 保存旧页面的状态
+            const currentState = getCurrentPageState();
+            if (currentState) {
+                pdfNavigation.saveCurrentPageState(currentState);
+                console.log(`已保存第${oldPageNum}页的状态:`, currentState);
+            }
+            
+            // 更新模板管理器的当前页面号
+            templateManager.setCurrentPage(pageNum);
+            
+            // 获取并应用新页面的数据
+            const targetPageData = pdfNavigation.getPageData(pageNum);
+            if (targetPageData) {
+                console.log(`应用第${pageNum}页的数据:`, targetPageData);
+                applyPageDataToDisplay(targetPageData);
+            } else {
+                console.error(`无法找到第${pageNum}页的数据`);
+            }
+        } else {
+            // 兼容旧的调用方式
+            saveCurrentPageStateAndSwitchTo(pageNum);
+        }
         
         showNotification(`已切换到第 ${pageNum} 页`, 'info');
     });

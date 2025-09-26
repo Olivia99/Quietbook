@@ -192,6 +192,19 @@ class PDFNavigation {
             return;
         }
         
+        // 如果切换到的是当前页面，则不需要处理
+        if (pageNum === this.currentPage) {
+            return;
+        }
+        
+        const oldPageNum = this.currentPage;
+        console.log(`页面切换: 从第${oldPageNum}页切换到第${pageNum}页`);
+        
+        // 触发页面切换回调（包含状态保存和恢复逻辑）
+        if (this.onPageChangeCallback) {
+            this.onPageChangeCallback(pageNum, oldPageNum);
+        }
+        
         // 更新当前页面
         this.currentPage = pageNum;
         
@@ -208,12 +221,7 @@ class PDFNavigation {
         // 更新页面计数显示
         this.updatePageCount();
         
-        // 触发页面切换回调
-        if (this.onPageChangeCallback) {
-            this.onPageChangeCallback(pageNum);
-        }
-        
-        console.log(`切换到第 ${pageNum} 页`);
+        console.log(`已切换到第 ${pageNum} 页`);
     }
     
     /**
