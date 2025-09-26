@@ -184,13 +184,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const exportBtn = document.querySelector('.btn-success');
     
     if (generateBtn) generateBtn.addEventListener('click', generatePage);
-    if (saveBtn) saveBtn.addEventListener('click', saveSettings);
+    if (saveBtn) saveBtn.addEventListener('click', saveProjectWithThumbnail);
     if (exportBtn) exportBtn.addEventListener('click', exportPDF);
     
     // 初始化页面函数
     function initializePage() {
         // 默认加载基础房间模板
         templateManager.switchToTemplate('basic-room');
+        
+        // 延迟加载项目设置，确保DOM元素已经准备好
+        setTimeout(() => {
+            loadProjectSettings();
+        }, 100);
         
         // 添加页面加载动画
         const paperPreview = document.getElementById('paperPreview');
@@ -202,6 +207,87 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         console.log('电子安静书制作工具已加载完成');
+    }
+    
+    // 加载项目设置
+    function loadProjectSettings() {
+        try {
+            const currentProjectData = sessionStorage.getItem('currentProject');
+            console.log('检查sessionStorage中的项目数据:', currentProjectData ? '找到数据' : '未找到数据');
+            
+            if (currentProjectData) {
+                const project = JSON.parse(currentProjectData);
+                console.log('解析项目数据:', project);
+                
+                let appliedSettings = [];
+                
+                // 应用纸张尺寸设置
+                if (project.paperSize) {
+                    const paperSizeRadio = document.querySelector(`input[name="paperSize"][value="${project.paperSize}"]`);
+                    console.log(`查找纸张尺寸单选按钮 [name="paperSize"][value="${project.paperSize}"]:`, paperSizeRadio ? '找到' : '未找到');
+                    if (paperSizeRadio) {
+                        paperSizeRadio.checked = true;
+                        appliedSettings.push(`纸张尺寸: ${project.paperSize}`);
+                        console.log('✓ 应用纸张尺寸:', project.paperSize);
+                    } else {
+                        console.warn('✗ 未找到纸张尺寸单选按钮:', project.paperSize);
+                    }
+                }
+                
+                // 应用页面方向设置
+                if (project.orientation) {
+                    const orientationRadio = document.querySelector(`input[name="orientation"][value="${project.orientation}"]`);
+                    console.log(`查找页面方向单选按钮 [name="orientation"][value="${project.orientation}"]:`, orientationRadio ? '找到' : '未找到');
+                    if (orientationRadio) {
+                        orientationRadio.checked = true;
+                        appliedSettings.push(`页面方向: ${project.orientation}`);
+                        console.log('✓ 应用页面方向:', project.orientation);
+                    } else {
+                        console.warn('✗ 未找到页面方向单选按钮:', project.orientation);
+                    }
+                }
+                
+                // 应用模板设置
+                if (project.template) {
+                    const templateSelect = document.getElementById('templateSelect');
+                    console.log('查找模板选择器 #templateSelect:', templateSelect ? '找到' : '未找到');
+                    if (templateSelect) {
+                        templateSelect.value = project.template;
+                        templateManager.switchToTemplate(project.template);
+                        appliedSettings.push(`模板: ${project.template}`);
+                        console.log('✓ 应用模板:', project.template);
+                    } else {
+                        console.warn('✗ 未找到模板选择器');
+                    }
+                }
+                
+                // 更新纸张预览
+                const currentSize = project.paperSize || getCurrentPaperSize();
+                const currentOrientation = project.orientation || getCurrentOrientation();
+                console.log('更新纸张预览:', currentSize, currentOrientation);
+                updatePaperPreviewOrientation(currentSize, currentOrientation);
+                
+                // 显示加载成功通知
+                if (appliedSettings.length > 0) {
+                    showNotification(`已加载项目: ${project.name}\n应用设置: ${appliedSettings.join(', ')}`, 'success');
+                    console.log('✓ 项目设置加载完成:', appliedSettings);
+                } else {
+                    showNotification(`项目 ${project.name} 加载完成，但未找到可应用的设置`, 'warning');
+                    console.warn('⚠ 项目数据存在但未能应用任何设置');
+                }
+                
+                // 延迟清除sessionStorage中的项目数据，给用户时间查看结果
+                setTimeout(() => {
+                    sessionStorage.removeItem('currentProject');
+                    console.log('已清除sessionStorage中的项目数据');
+                }, 3000);
+            } else {
+                console.log('没有找到项目数据，使用默认设置');
+            }
+        } catch (error) {
+            console.error('加载项目设置时出错:', error);
+            showNotification('加载项目设置时出错: ' + error.message, 'error');
+        }
     }
     
     // 处理模板变化
@@ -1483,6 +1569,11 @@ function autoSaveCurrentPageState() {
             
             // 更新当前页面的缩略图
             updateCurrentPageThumbnail();
+            
+            // 如果是第一页，更新项目预览图
+            if (pdfNavigation.getCurrentPage() === 1) {
+                updateProjectThumbnail();
+            }
         }
     }, 50);
 }
@@ -1559,5 +1650,169 @@ function restoreUISelectionState(decorations) {
         }
         
         console.log('恢复踢脚线颜色:', decorations.baseboard);
+    }
+}
+
+// ==================== 项目预览图生成 ====================
+
+/**
+ * 生成项目第一页的预览图
+ * @returns {Promise<string|null>} 返回base64格式的图片数据，失败时返回null
+ */
+async function generateProjectThumbnail() {
+    try {
+        // 检查html2canvas是否可用
+        if (typeof html2canvas === 'undefined') {
+            console.error('html2canvas库未加载');
+            return null;
+        }
+
+        // 获取预览区域元素
+        const paperPreview = document.getElementById('paperPreview');
+        if (!paperPreview) {
+            console.error('找不到预览区域');
+            return null;
+        }
+
+        // 检查预览区域是否有内容
+        if (paperPreview.offsetWidth === 0 || paperPreview.offsetHeight === 0) {
+            console.error('预览区域为空');
+            return null;
+        }
+
+        // 确保当前在第一页
+        if (pdfNavigation && pdfNavigation.getCurrentPage() !== 1) {
+            // 保存当前页面状态
+            const currentState = getCurrentPageState();
+            if (currentState) {
+                pdfNavigation.saveCurrentPageState(currentState);
+            }
+            
+            // 切换到第一页
+            await pdfNavigation.switchToPage(1);
+            
+            // 等待页面渲染完成
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        // 生成截图
+        const canvas = await html2canvas(paperPreview, {
+            allowTaint: true,
+            useCORS: true,
+            scale: 0.5, // 降低分辨率以减小文件大小
+            width: paperPreview.offsetWidth,
+            height: paperPreview.offsetHeight,
+            backgroundColor: '#ffffff'
+        });
+
+        // 转换为base64格式
+        const thumbnailData = canvas.toDataURL('image/jpeg', 0.8); // 使用JPEG格式，质量80%
+        
+        console.log('项目预览图生成成功');
+        return thumbnailData;
+
+    } catch (error) {
+        console.error('生成项目预览图失败:', error);
+        return null;
+    }
+}
+
+/**
+ * 异步更新项目预览图（用于自动保存）
+ */
+function updateProjectThumbnail() {
+    // 使用setTimeout避免阻塞UI
+    setTimeout(async () => {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('project');
+            
+            if (!projectId) return;
+
+            const projects = JSON.parse(localStorage.getItem('quietBookProjects') || '[]');
+            const projectIndex = projects.findIndex(p => p.id === projectId);
+            
+            if (projectIndex === -1) return;
+
+            // 生成新的预览图
+            const thumbnail = await generateProjectThumbnail();
+            
+            if (thumbnail) {
+                const project = projects[projectIndex];
+                project.thumbnail = thumbnail;
+                project.modifiedAt = new Date().toISOString();
+                
+                // 更新页面数量
+                if (pdfNavigation) {
+                    project.pages = pdfNavigation.getTotalPages();
+                }
+                
+                localStorage.setItem('quietBookProjects', JSON.stringify(projects));
+                console.log('项目预览图已更新');
+            }
+        } catch (error) {
+            console.error('更新项目预览图失败:', error);
+        }
+    }, 1000); // 延迟1秒执行，避免频繁更新
+}
+
+/**
+ * 保存项目到localStorage，包含预览图
+ */
+async function saveProjectWithThumbnail() {
+    try {
+        // 获取当前项目ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('project');
+        
+        if (!projectId) {
+            console.error('未找到项目ID');
+            showNotification('保存失败：未找到项目ID', 'error');
+            return;
+        }
+
+        // 获取项目列表
+        const projects = JSON.parse(localStorage.getItem('quietBookProjects') || '[]');
+        const projectIndex = projects.findIndex(p => p.id === projectId);
+        
+        if (projectIndex === -1) {
+            console.error('未找到项目');
+            showNotification('保存失败：未找到项目', 'error');
+            return;
+        }
+
+        // 保存当前页面状态
+        const currentState = getCurrentPageState();
+        if (currentState && pdfNavigation) {
+            pdfNavigation.saveCurrentPageState(currentState);
+        }
+
+        // 生成预览图
+        showNotification('正在生成预览图...', 'info');
+        const thumbnail = await generateProjectThumbnail();
+
+        // 更新项目信息
+        const project = projects[projectIndex];
+        project.modifiedAt = new Date().toISOString();
+        
+        // 更新页面数量
+        if (pdfNavigation) {
+            project.pages = pdfNavigation.getTotalPages();
+        }
+
+        // 更新预览图
+        if (thumbnail) {
+            project.thumbnail = thumbnail;
+        }
+
+        // 保存到localStorage
+        localStorage.setItem('quietBookProjects', JSON.stringify(projects));
+        
+        showNotification('项目保存成功！', 'success');
+        console.log('项目保存成功，包含预览图');
+
+    } catch (error) {
+        console.error('保存项目失败:', error);
+        showNotification('保存项目失败', 'error');
     }
 }
